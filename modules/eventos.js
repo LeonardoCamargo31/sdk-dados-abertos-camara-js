@@ -1,0 +1,86 @@
+import { get } from './api';
+import { validateOptions, validateFormat } from './utils';
+
+const defaultOptions = {
+  pagina: 1,
+  ordem: 'ASC',
+  format: 'json',
+};
+
+/**
+ * Wraps the /eventos endpoint
+ *
+ * @param {Object} options - Options to be sent in the request.
+ * @param {Boolean} fullResponse - If true it will retrieve the whole response object, otherwise it will return only the data object inside the response.
+ */
+
+export const getEventos = async (
+  options = {
+    ...defaultOptions,
+    ordenarPor: 'nome',
+  },
+  fullResponse = false
+) => {
+  const availableOrderFields = [
+    'id',
+    'dataHoraInicio',
+    'dataHoraFim',
+    'descricaoSituacao',
+    'descricaoTipo',
+    'titulo',
+  ];
+  const availableOptions = [
+    'id',
+    'codTipoEvento',
+    'codSituacao',
+    'codTipoOrgao',
+    'idOrgao',
+    'dataInicio',
+    'dataFim',
+    'horaInicio',
+    'horaFim',
+  ];
+
+  try {
+    const res = await get(
+      'eventos',
+      options,
+      availableOrderFields,
+      availableOptions
+    );
+
+    return fullResponse ? res : res.data;
+  } catch (err) {
+    throw err;
+  }
+};
+
+/**
+ * Wraps /evento/{id} endpoint.
+ *
+ * @param {Integer} id - ID of the evento that will be requested.
+ * @param {String} format - Desired response format, default is json.
+ * @param {Boolean} fullResponse - If true it will retrieve the whole response object, otherwise it will return only the data object inside the response.
+ */
+export const getEvento = async (id, format = 'json', fullResponse = false) => {
+  if (!id) {
+    throw new Error('Required parameter ID is not present!');
+  }
+
+  if (!validateFormat(format)) {
+    throw new Error('Invalid format!');
+  }
+
+  try {
+    const res = await get(`eventos/${id}`, { format });
+
+    return fullResponse ? res : res.data;
+  } catch (err) {
+    throw err;
+  }
+};
+
+export default {
+  getEventos,
+  getEventos,
+};
